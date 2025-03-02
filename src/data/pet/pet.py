@@ -7,10 +7,10 @@ from src.data.pet.tag import Tag
 @dataclass
 class Pet:
     id: int
-    category: Category
+    category: Category | dict
     name: str
-    photo_urls: list[str]
-    tags: list[Tag]
+    photoUrls: list[str]
+    tags: list[Tag] | list[dict]
     status: str
 
     def to_dict(self) -> dict:
@@ -18,11 +18,7 @@ class Pet:
         Represents data object in dictionary
         :return: dict respresentation
         """
-        return {
-            'id': self.id,
-            'category': self.category if isinstance(self.category, dict) else self.category.to_dict(),
-            'name': self.name,
-            'photoUrls': self.photo_urls,
-            'tags': [tag if isinstance(tag, dict) else tag.to_dict() for tag in self.tags],
-            'status': self.status
-        }
+        self.category = self.category if isinstance(self.category, dict) else self.category.to_dict()
+        self.tags = [tag if isinstance(tag, dict) else tag.to_dict() for tag in self.tags]
+
+        return self.__dict__

@@ -11,7 +11,4 @@ class Tag:
         Represents data object in dictionary
         :return: dict respresentation
         """
-        return {
-            'id': self.id,
-            'name': self.name
-        }
+        return self.__dict__

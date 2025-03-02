@@ -3,12 +3,15 @@ from requests import Response
 from src.data.pet.pet import Pet
 from src.json_schemas.pet_schemas import pet_schema
 from utils.base_api import BaseApi
+from utils.helpers import get_random_number
 
 
 class PetApi(BaseApi):
     def __init__(self):
         super().__init__()
         self.__endpoint = '/pet'
+        self.__min_valid_pet_id = 1
+        self.__max_valid_pet_id = 999999999999999999
 
     def get_pet(self, pet_id: int) -> Response:
         """
@@ -16,7 +19,7 @@ class PetApi(BaseApi):
         :param pet_id: Pet ID
         :return: API response
         """
-        return self._send_request(method='GET', endpoint=f'{self.__endpoint}/{pet_id}')
+        return self._get(endpoint=f'{self.__endpoint}/{pet_id}')
 
     def add_pet(self, pet: Pet, is_unsupported_content_type: bool = False) -> Response:
         """
@@ -27,15 +30,7 @@ class PetApi(BaseApi):
         """
         request_body = pet.to_dict()
         headers = {'Content-Type': 'text/html'} if is_unsupported_content_type else {}
-        return self._send_request(method='POST', endpoint=self.__endpoint, headers=headers, json=request_body)
-
-    def validate_pet_schema(self, response_body: dict) -> bool:
-        """
-        Validates the response schema for a pet.
-        :param response_body: Response body to validate
-        :return: True if valid, False otherwise
-        """
-        return self._validate_schema_of_response_body(response_body, pet_schema)
+        return self._post(endpoint=self.__endpoint, headers=headers, json=request_body)
 
     def update_pet(self, pet: Pet | dict, is_unsupported_content_type: bool = False) -> Response:
         """
@@ -46,7 +41,7 @@ class PetApi(BaseApi):
         """
         request_body = pet.to_dict()
         headers = {'Content-Type': 'text/html'} if is_unsupported_content_type else {}
-        return self._send_request(method='PUT', endpoint=self.__endpoint, headers=headers, json=request_body)
+        return self._put(endpoint=self.__endpoint, headers=headers, json=request_body)
 
     def delete_pet(self, pet_id: int) -> Response:
         """
@@ -54,7 +49,22 @@ class PetApi(BaseApi):
         :param pet_id: Pet ID to delete
         :return: API response
         """
-        return self._send_request(method='DELETE', endpoint=f'{self.__endpoint}/{pet_id}')
+        return self._delete(endpoint=f'{self.__endpoint}/{pet_id}')
+
+    def validate_pet_schema(self, response_body: dict) -> bool:
+        """
+        Validates the response schema for a pet.
+        :param response_body: Response body to validate
+        :return: True if valid, False otherwise
+        """
+        return self._validate_schema_of_response_body(response_body, pet_schema)
+
+    def generate_random_pet_id(self) -> int:
+        """
+        Generates random valid pet id
+        :return: pet id
+        """
+        return get_random_number(self.__min_valid_pet_id, self.__max_valid_pet_id)
 
     def is_pet_exist(self, pet_id: int) -> bool:
         """
