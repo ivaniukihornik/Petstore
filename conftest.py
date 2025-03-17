@@ -7,6 +7,7 @@ from src.resources.pet_api import PetApi
 from src.data.pet.category import Category
 from src.data.pet.pet import Pet
 from src.data.pet.tag import Tag
+from utils.random_data_generator import generate_random_id
 
 
 @pytest.fixture
@@ -19,10 +20,9 @@ def create_pet_api() -> PetApi:
 
 
 @pytest.fixture()
-def pc_generate_pet_object(create_pet_api) -> Callable:
+def pc_generate_pet_object() -> Callable:
     """
     Generates a Pet object with various data.
-    :param create_pet_api: Instance of PetApi fixture.
     :return: Callable function that generates a Pet object based on provided parameters.
     """
 
@@ -34,17 +34,11 @@ def pc_generate_pet_object(create_pet_api) -> Callable:
         :param fields_to_replace: Optional dictionary to override specific pet fields.
         :return: Generated Pet object.
         """
-        api = create_pet_api
-        if not pet_id:
-            pet_id = api.generate_random_pet_id()
+        if not pet_id and pet_id != 0:
+            pet_id = generate_random_id()
         match data:
             case 'new':
-                pet = Pet(id=pet_id,
-                          category=Category(3, 'Dog'),
-                          name='Jiber',
-                          photoUrls=['https://photo1.jpg', 'https://photo2.jpg'],
-                          tags=[Tag(1, 'tag1'), Tag(2, 'tag2')],
-                          status='available')
+                pet = Pet(id=pet_id)
             case 'update':
                 pet = Pet(id=pet_id,
                           category=Category(1000, 'UPDATED_CATEGORY'),
@@ -55,8 +49,8 @@ def pc_generate_pet_object(create_pet_api) -> Callable:
             case _:
                 raise ValueError('Unknown "data" argument. Pass a valid value.')
         if fields_to_replace:
-            for k, v in fields_to_replace.items():
-                setattr(pet, k, v)
+            for key, value in fields_to_replace.items():
+                setattr(pet, key, value)
 
         return pet
 
@@ -64,12 +58,12 @@ def pc_generate_pet_object(create_pet_api) -> Callable:
 
 
 @pytest.fixture()
-def pc_create_new_pet(create_pet_api, pc_generate_pet_object) -> int:
+def pc_create_new_pet(create_pet_api, pc_generate_pet_object) -> Pet:
     """
     Creates a new pet in API. If the pet already exists, it is deleted and re-added.
     :param create_pet_api: Instance of PetApi fixture.
     :param pc_generate_pet_object: Function to generate a Pet object.
-    :return: ID of the created pet.
+    :return: Created pet object.
     """
     api = create_pet_api
     pet = pc_generate_pet_object(data='new')
@@ -78,7 +72,7 @@ def pc_create_new_pet(create_pet_api, pc_generate_pet_object) -> int:
     else:
         api.delete_pet(pet.id)
         api.add_pet(pet)
-    return pet.id
+    return pet
 
 
 @pytest.fixture()
@@ -96,8 +90,8 @@ def pc_delete_pet_if_exists(create_pet_api) -> Callable:
         :return: The pet ID that was checked for deletion.
         """
         api = create_pet_api
-        if not pet_id:
-            pet_id = api.generate_random_pet_id()
+        if not pet_id and pet_id != 0:
+            pet_id = generate_random_id()
         if api.is_pet_exist(pet_id):
             api.delete_pet(pet_id)
         return pet_id
@@ -112,4 +106,4 @@ def pytest_runtest_setup(item):
 
 def pytest_runtest_teardown(item):
     """Logs the end of a test."""
-    logger.info(f'Test finished: {item.name}')
+    logger.info(f'Test finished: {item.name}\n')

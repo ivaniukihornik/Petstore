@@ -1,17 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from src.data.pet.category import Category
 from src.data.pet.tag import Tag
+import names
 
 
 @dataclass
 class Pet:
     id: int
-    category: Category | dict
-    name: str
-    photoUrls: list[str]
-    tags: list[Tag] | list[dict]
-    status: str
+    category: Category | dict = field(default_factory=Category)
+    name: str = names.get_first_name()
+    photoUrls: list[str] = field(default_factory=lambda: ['https://photo1.jpg', 'https://photo2.jpg'])
+    tags: list[Tag] | list[dict] = field(default_factory=lambda: [Tag(), Tag()])
+    status: str = 'available'
 
     def to_dict(self) -> dict:
         """

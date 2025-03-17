@@ -3,15 +3,12 @@ from requests import Response
 from src.data.pet.pet import Pet
 from src.json_schemas.pet_schemas import pet_schema
 from utils.base_api import BaseApi
-from utils.helpers import get_random_number
 
 
 class PetApi(BaseApi):
     def __init__(self):
         super().__init__()
         self.__endpoint = '/pet'
-        self.__min_valid_pet_id = 1
-        self.__max_valid_pet_id = 999999999999999999
 
     def get_pet(self, pet_id: int) -> Response:
         """
@@ -51,20 +48,14 @@ class PetApi(BaseApi):
         """
         return self._delete(endpoint=f'{self.__endpoint}/{pet_id}')
 
-    def validate_pet_schema(self, response_body: dict) -> bool:
+    def validate_pet_schema(self, response_body: dict) -> None | bool:
         """
         Validates the response schema for a pet.
         :param response_body: Response body to validate
-        :return: True if valid, False otherwise
+        :return: True if valid, raises Exception otherwise
         """
-        return self._validate_schema_of_response_body(response_body, pet_schema)
-
-    def generate_random_pet_id(self) -> int:
-        """
-        Generates random valid pet id
-        :return: pet id
-        """
-        return get_random_number(self.__min_valid_pet_id, self.__max_valid_pet_id)
+        self._validate_schema_of_response_body(response_body, pet_schema)
+        return True
 
     def is_pet_exist(self, pet_id: int) -> bool:
         """
