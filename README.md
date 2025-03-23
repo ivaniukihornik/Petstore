@@ -7,6 +7,6 @@ ____
 2. Make sure you have installed python in your system
 3. Create python virtual environment and activate it
 4. Open project root dir and install environment dependencies using `python -m pip install -r requirements.txt`
-5. Run tests with `pytest --html=report.html`
+5. Run tests with `pytest --html=test_results/report.html`
 6. Open `report.html` in your browser 
 7. To view detailed logs open `test.log` file in a project root

@@ -4,6 +4,5 @@ Scripts/
 pyvenv.cfg
 .idea/
 __pycache__/
-report.html
-assets/
-test.log
+test_results/test.log
+test_results/report.html
