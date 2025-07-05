@@ -1,0 +1,8 @@
+.pytest_cache/
+Lib/
+Scripts/
+pyvenv.cfg
+.idea/
+__pycache__/
+test_results/test.log
+test_results/report.html
